@@ -26,11 +26,11 @@ app.post('/valores/:id', (req, res) => {
         if (index !== -1) {
             // Atualizar o conjunto de valores existente
             valores[index] = { id, ...body };
-            res.status(200).json({ message: 'Valores atualizados com sucesso!',  id, ...body });
+            res.status(200).json({ message: 'Valores atualizados com sucesso!', valores: { id, ...body } });
         } else {
             // Adicionar um novo conjunto de valores
             valores.push({ id, ...body });
-            res.status(201).json({ message: 'Valores armazenados com sucesso!', valores: id, ...body  });
+            res.status(201).json({ message: 'Valores armazenados com sucesso!', valores: { id, ...body } });
         }
     } else {
         res.status(400).json({ message: 'Um ou mais valores estão ausentes.' });
@@ -39,7 +39,7 @@ app.post('/valores/:id', (req, res) => {
 
 // Rota GET para obter todos os conjuntos de valores armazenados
 app.get('/valores', (req, res) => {
-    res.status(200).json({ valores });
+    res.status(200).json({ });
 });
 
 // Inicia o servidor
