@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+
+// Porta dinâmica para Heroku ou 3000 localmente
+const port = process.env.PORT || 3000;
 
 // Middleware para processar o JSON enviado no corpo da requisição
 app.use(express.json());
@@ -27,6 +29,7 @@ app.get('/valores', (req, res) => {
     res.status(200).json({ valores });
 });
 
+// Inicia o servidor
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
 });
