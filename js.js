@@ -1,17 +1,14 @@
 const express = require('express');
-const app = express();
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-// Porta dinâmica para Heroku ou 3000 localmente
+const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware para processar o JSON enviado no corpo da requisição
 app.use(express.json());
 
-// Array em memória para armazenar os valores com um identificador
-let valores = [];
-
 // Rota POST para armazenar ou atualizar os valores enviados no corpo da requisição
-app.post('/valores/:id', (req, res) => {
+app.post('/valores/:id', async (req, res) => {
     const { id } = req.params;
     const body = req.body;
 
@@ -20,17 +17,27 @@ app.post('/valores/:id', (req, res) => {
     const allValuesPresent = requiredItems.every(key => body.hasOwnProperty(key));
 
     if (allValuesPresent) {
-        // Procurar se já existe um conjunto de valores com o ID fornecido
-        const index = valores.findIndex(v => v.id === id);
-        
-        if (index !== -1) {
-            // Atualizar o conjunto de valores existente
-            valores[index] = { id, ...body };
-            res.status(200).json({ message: 'Valores atualizados com sucesso!', valores: { id, ...body } });
-        } else {
-            // Adicionar um novo conjunto de valores
-            valores.push({ id, ...body });
-            res.status(201).json({ message: 'Valores armazenados com sucesso!', valores: { id, ...body } });
+        try {
+            // Procurar se já existe um conjunto de valores com o ID fornecido
+            const existingValor = await prisma.valor.findUnique({ where: { id } });
+
+            if (existingValor) {
+                // Atualizar o conjunto de valores existente
+                const updatedValor = await prisma.valor.update({
+                    where: { id },
+                    data: body,
+                });
+                res.status(200).json({ message: 'Valores atualizados com sucesso!', valores: updatedValor });
+            } else {
+                // Adicionar um novo conjunto de valores
+                const newValor = await prisma.valor.create({
+                    data: { id, ...body },
+                });
+                res.status(201).json({ message: 'Valores armazenados com sucesso!', valores: newValor });
+            }
+        } catch (error) {
+            console.error('Erro ao processar a requisição', error);
+            res.status(500).json({ message: 'Erro interno do servidor.' });
         }
     } else {
         res.status(400).json({ message: 'Um ou mais valores estão ausentes.' });
@@ -38,8 +45,14 @@ app.post('/valores/:id', (req, res) => {
 });
 
 // Rota GET para obter todos os conjuntos de valores armazenados
-app.get('/valores', (req, res) => {
-    res.status(200).json({ valores });
+app.get('/valores', async (req, res) => {
+    try {
+        const valores = await prisma.valor.findMany();
+        res.status(200).json({ valores });
+    } catch (error) {
+        console.error('Erro ao obter os valores', error);
+        res.status(500).json({ message: 'Erro interno do servidor.' });
+    }
 });
 
 // Inicia o servidor

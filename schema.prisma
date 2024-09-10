@@ -1,0 +1,35 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://u24okg47tt3jut:p222c8b15bd2ddf0f4d4b7260c8fd5cd67575bcea7d659c0a0f75b92c2c064697@c97r84s7"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Valor {
+  id     String @id
+  item1  String
+  item2  String
+  item3  String
+  item4  String
+  item5  String
+  item6  String
+  item7  String
+  item8  String
+  item9  String
+  item10 String
+  item11 String
+  item12 String
+  item13 String
+  item14 String
+  item15 String
+  item16 String
+  item17 String
+  item18 String
+  item19 String
+  item20 String
+  item21 String
+  item22 String
+  item23 String
+}
