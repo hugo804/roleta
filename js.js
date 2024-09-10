@@ -39,7 +39,7 @@ app.post('/valores/:id', (req, res) => {
 
 // Rota GET para obter todos os conjuntos de valores armazenados
 app.get('/valores', (req, res) => {
-    res.status(200).json({ });
+    res.status(200).json({ valores });
 });
 
 // Inicia o servidor
