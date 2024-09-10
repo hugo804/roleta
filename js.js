@@ -13,21 +13,24 @@ let valores = [];
 // Rota POST para armazenar ou atualizar os valores enviados no corpo da requisição
 app.post('/valores/:id', (req, res) => {
     const { id } = req.params;
-    const { valor1, valor2, valor3, valor4, valor5 } = req.body;
-    
-    // Verificar se todos os valores foram enviados
-    if (valor1 !== undefined && valor2 !== undefined && valor3 !== undefined && valor4 !== undefined && valor5 !== undefined) {
+    const body = req.body;
+
+    // Verificar se todos os valores (item1 até item23) estão presentes
+    const requiredItems = Array.from({ length: 23 }, (_, i) => `item${i + 1}`);
+    const allValuesPresent = requiredItems.every(key => body.hasOwnProperty(key));
+
+    if (allValuesPresent) {
         // Procurar se já existe um conjunto de valores com o ID fornecido
         const index = valores.findIndex(v => v.id === id);
         
         if (index !== -1) {
             // Atualizar o conjunto de valores existente
-            valores[index] = { id, valor1, valor2, valor3, valor4, valor5 };
-            res.status(200).json({ message: 'Valores atualizados com sucesso!', valores: { id, valor1, valor2, valor3, valor4, valor5 } });
+            valores[index] = { id, ...body };
+            res.status(200).json({ message: 'Valores atualizados com sucesso!', valores: { id, ...body } });
         } else {
             // Adicionar um novo conjunto de valores
-            valores.push({ id, valor1, valor2, valor3, valor4, valor5 });
-            res.status(201).json({ message: 'Valores armazenados com sucesso!', valores: { id, valor1, valor2, valor3, valor4, valor5 } });
+            valores.push({ id, ...body });
+            res.status(201).json({ message: 'Valores armazenados com sucesso!', valores: { id, ...body } });
         }
     } else {
         res.status(400).json({ message: 'Um ou mais valores estão ausentes.' });
